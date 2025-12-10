@@ -529,7 +529,7 @@ def _get_gfx(scn: Scene, mat: bpy.types.Material, item: StructureItem,
 
     img = Image.open(io.BytesIO(img_or_color.data)).convert("RGBA")
     if img.size != size:
-        img.resize(size, resampling)
+        img = img.resize(size, resampling)
     if mat.smc_size:
         img.thumbnail((mat.smc_size_width, mat.smc_size_height), resampling)
     if max(item['gfx']['uv_size'], default=0) > 1:
@@ -565,7 +565,7 @@ def _get_orm_gfx(scn: Scene, mat: bpy.types.Material, item: StructureItem, orm_d
              # PackedFile
              ch_img = Image.open(io.BytesIO(val.data)).convert("L")
              if ch_img.size != size:
-                 ch_img.resize(size, resampling)
+                 ch_img = ch_img.resize(size, resampling)
              if mat.smc_size:
                  ch_img.thumbnail((mat.smc_size_width, mat.smc_size_height), resampling)
              if max(item['gfx']['uv_size'], default=0) > 1:
