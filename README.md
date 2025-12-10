@@ -1,112 +1,84 @@
-material-combiner-addon
-===========
+# Material Combiner Addon (yequ 修改版)
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Grim-es/material-combiner-addon)](https://github.com/Grim-es/material-combiner-addon/releases/latest)
 [![GitHub issues](https://img.shields.io/github/issues/Grim-es/material-combiner-addon)](https://github.com/Grim-es/material-combiner-addon/issues)
 [![GitHub stars](https://img.shields.io/github/stars/Grim-es/material-combiner-addon)](https://github.com/Grim-es/material-combiner-addon/stargazers)
 
-#### An add-on for Blender that helps reduce draw calls in game engines by combining textures without quality loss and avoiding issues with UV bounds larger than 0–1.
+#### 一个 Blender 插件，通过在不损失质量的情况下合并纹理并避免 UV 边界大于 0-1 的问题，帮助减少游戏引擎中的 Draw Call。
 
-#### If you like an add-on, you can support my work on Patreon or Buy me a coffee.
+**本版本由 bilibili:夜曲_flac 在原版插件基础上进行修改和增强。**
 
+---
+
+## 🌟 新增功能
+
+此版本在原有功能基础上增加了对次世代游戏流程贴图的全面支持：
+
+1.  **多通道贴图合并支持**：
+    *   除了基础颜色（Diffuse）外，现在支持 **法线贴图 (Normal)** 和 **ORM 贴图 (Occlusion, Roughness, Metallic)** 的合并。
+    *   生成的 Atlas 将自动包含 `_D` (颜色), `_N` (法线), `_ORM` (混合通道) 三张贴图。
+
+2.  **智能混合贴图处理**：
+    *   自动识别并处理混合贴图配置（如 ORM 或 MRO 贴图）。
+    *   支持将独立的 AO、粗糙度（Roughness）、金属度（Metallic）贴图通道打包成标准的 ORM 格式（红=AO，绿=粗糙度，蓝=金属度）。
+
+3.  **智能缺省值填充**：
+    *   当材质缺失某些贴图通道时，插件会自动使用标准默认值填充，确保合并后的 Atlas 完整可用：
+        *   **法线**：自动填充平坦法线 (RGB: 128, 128, 255)。
+        *   **AO**：自动填充纯白 (1.0)。
+        *   **粗糙度**：自动填充全粗糙 (1.0)。
+        *   **金属度**：自动填充非金属 (0.0)。
+
+4.  **自动分辨率适配**：
+    *   解决了不同通道贴图分辨率不一致的问题（例如 2K 的颜色贴图配 64x64 的纯色法线）。插件会自动将小尺寸贴图缩放以匹配目标 Atlas 区域，防止出现错位或空白。
+
+5.  **规范化文件命名**：
+    *   输出文件自动添加后缀以便识别：
+        *   `Atlas_XXXX_D.png` (颜色)
+        *   `Atlas_XXXX_N.png` (法线)
+        *   `Atlas_XXXX_ORM.png` (ORM)
+
+---
+
+## 原始功能 (Features)
+
+*   **多材质合并**：允许混合漫反射颜色与纹理，并指定生成的图集大小及每个纹理的大小。
+*   **多重合并**：为每个材质添加图像层，将其合并到不同的图集中。
+*   **UV 打包**：通过拆分网格面将 UV 打包到选定的比例范围内，并兼容绑定模型。
+
+## 安装指南 (Installation)
+
+1.  下载插件压缩包。
+2.  打开 Blender，进入 `Edit` (编辑) > `Preferences` (偏好设置) > `Add-ons` (插件)。
+3.  点击 `Install...` (安装...)。
+4.  选择下载的 zip 压缩包。
+5.  勾选 `Material Combiner` 启用插件。
+
+## 使用方法 (How to Use)
+
+1.  安装并启用插件后，进入 Blender 的 3D 视图。
+2.  按 `N` 键打开侧边栏。
+3.  找到 **MatCombiner** 标签页。
+4.  你会看到对象及其对应材质的列表：
+    *   你可以勾选/取消勾选材质旁的方框来决定是否包含在合并过程中。
+    *   每个对象都有 **Select All** (全选) 或 **Deselect All** (全不选) 按钮。
+5.  对于没有图片的材质，可以设置默认大小（默认为 32 像素）。
+6.  选择完毕后，点击 `Save atlas to..` 按钮开始合并过程。
+
+## 常见问题 (Known Issues)
+
+### 点击 "Save atlas to…" 后材质只是简单合并或图集缺失纹理
+*   纹理被打包在 .blend 文件中。请先保存 .blend 文件，然后转到 `File` > `External Data` > `Unpack Resources` 将纹理解压出来。
+*   如果您使用的 Blender 非英文版，节点名称可能不同。建议切换到英文版 Blender 并重新导入模型以重新生成节点。
+*   使用了不支持的着色器或错误的节点名称。
+
+### 报错 "NameError: name 'Dict' is not defined" 或 "module ... has no attribute 'make_annotations'"
+*   **已在本版本中修复**：这些是原版插件在较新 Python/Blender 版本中的兼容性问题，yequ 修改版已修复这些安装错误。
+
+---
+
+#### 原作者信息
+Original Addon by [shotariya](https://github.com/Grim-es/material-combiner-addon)
+If you like the original add-on, you can support the original author on Patreon or Buy me a coffee.
 [<img src="http://webgrimes.com/buymeacoffee.svg" height="40px">](https://www.buymeacoffee.com/shotariya)
 [<img src="http://webgrimes.com/patreon.png" height="40px">](https://www.patreon.com/join/shotariya?)
-
-## FEATURES
-
-* **Combining Multiple Materials**: Allows you to mix diffuse colors with textures, and specify both the size of the
-  resulting atlas and the size of each texture.
-* **Multi-combining**: Adds image-layers for each material, which are combined into different atlases. This feature
-  supports the generation of Normal maps, Specular maps, and other atlases. (Not implemented in newer versions |
-  Supported in version 2.0.3.3)
-* **UV Packing**: Packs UVs into the selected scale bounds by splitting mesh faces, and is compatible with rigged
-  models. (Not implemented in newer versions | Supported in version 1.1.6.3)
-
-## INSTALLATION
-
-1. Download an add-on: [Material-combiner](https://github.com/Grim-es/material-combiner-addon/archive/master.zip).
-2. Go to File > User Preferences > Add-ons.
-3. Click on Install Add-on from File.
-4. Choose `material-combiner-addon-master.zip` archive.
-5. Activate Material Combiner.
-
-## HOW OT USE
-
-1. Once the add-on is installed and activated, go to the 3D Viewport in Blender.
-2. On the right side of the 3D View (Scene) window, open the side panel by pressing the `N` key on your keyboard.
-3. In the side panel, locate the **MatCombiner** section.
-4. You will see a list of objects and their corresponding materials:
-    - For each material, you can choose to include or exclude it from the atlasing process by checking or unchecking the
-      box next to it.
-    - Each object has a **Select All** or **Deselect All** button, allowing you to quickly enable or disable atlasing
-      for all of its materials.
-5. You can also set the size for materials that do not have an image. The default size is set to 32 pixels.
-6. Once you have made your selections, click the `Save atlas to..` button to start the atlasing process.
-7. If the materials are not merged properly or the atlas image does not contain all the textures, please refer to the
-   section:
-   [After clicking "Save atlas to…" the materials are simply merged or the atlas image does not have all the textures](https://github.com/Grim-es/material-combiner-addon/tree/master?tab=readme-ov-file#after-clicking-save-atlas-to-the-materials-are-simply-merged-or-the-atlas-image-does-not-have-all-the-textures).
-
-## KNOWN ISSUES
-
-### After clicking "Save atlas to…" the materials are simply merged or the atlas image does not have all the textures
-
-- Textures are packaged in a .blend file. Save the .blend file to a location of your choice, then go to File > External
-  Data > Unpack Resources / Unpack All Into Files to extract the textures.
-- Your version of Blender is not in English, in this case the nodes will be named differently, their names are strictly
-  written in the script. You need to manually rename the nodes to their own names, or switch the blender version to
-  English and regenerate the nodes by re-importing the model.
-- You are using an unsupported shader (Surface property of material) or incorrect node names. You can check the
-  file [utils/materials.py](https://github.com/Grim-es/material-combiner-addon/blob/781d70fbbc2ddfa6813c61255c0cb6c501307a3e/utils/materials.py#L19-L40)
-  to see which shaders are supported and what node names should be used. For more details, refer to the relevant
-  discussion on GitHub: [Issue #98](https://github.com/Grim-es/material-combiner-addon/issues/98).
-- If objects already share the same material with the same texture, they will not be atlased because they are already
-  optimized, and the existing image will be used instead.
-
-### Pillow installation process is repeated
-
-- Make sure the VPN is not currently active.
-
-- **Windows** | Verify that Blender is not installed from the Windows Store, as it may not function correctly. To
-  install Pillow manually, navigate to your Blender installation folder, then to the folder with the
-  ***blender version name\python\bin*** and copy this path. Press ***Win+R*** on your keyboard, type ***cmd.exe***, and
-  press Enter. In the Windows console, enter the following commands:
-    ```powershell
-    set PythonPath="Your\Copied\Path\To\Python\bin\Folder"
-
-    %PythonPath%\python.exe -m pip install Pillow --user --upgrade
-    ```
-  Replace ***Your\Copied\Path\To\Python\bin\Folder*** with the path you copied.
-
-- **macOS** | Open a Terminal console and execute the following commands:
-    ```bash
-    /Applications/Blender.app/Contents/MacOS/Blender -b --python-expr "__import__('ensurepip')._bootstrap()" 
-
-    /Applications/Blender.app/Contents/MacOS/Blender -b --python-expr "__import__('pip._internal')._internal.main(['install', '-U', 'pip', 'setuptools', 'wheel'])"
-
-    /Applications/Blender.app/Contents/MacOS/Blender -b --python-expr "__import__('pip._internal')._internal.main(['install', 'Pillow'])"
-    ```
-  If you install Blender in a different location, adjust the path at the beginning of each command accordingly.
-
-### No module named 'material-combiner-addon-2'
-
-You have installed the source code from the Releases. Instead, install from the "master"
-branch [Material-combiner](https://github.com/Grim-es/material-combiner-addon/archive/master.zip). Before doing so,
-remove the old installation folder. The default locations are:
-
-* **Windows**
-    ```console
-    C:\Users\YourUserName\AppData\Roaming\Blender Foundation\Blender\BlenderVersion\scripts\addons
-    ```
-  Replace ***YourUserName*** with your actual username and ***BlenderVersion*** with the version of Blender you are
-  using.
-* **MacOS**
-    ```console
-    /Users/YourUserName/Library/Application Support/Blender/BlenderVersion/scripts/addons
-    ```
-  Replace ***YourUserName*** with your actual username and ***BlenderVersion*** with the version of Blender you are
-  using.
-
-## BUGS / SUGGESTIONS
-
-If you have found a bug or have suggestions to improve the tool, you can contact me on
-Discord: [@shotariya](https://discordapp.com/users/275608234595713024)
